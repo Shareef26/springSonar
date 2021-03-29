@@ -1,9 +1,15 @@
 package com.SpringJPA.controller;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,10 +28,18 @@ public class PersonController {
 	
 	
 	public static final Logger logger=LogManager.getLogger(PersonController.class);
-
+    
+	
+	
 	
 	@PostMapping(consumes = "application/json", produces = "application/json")
 	public ResponseEntity<String> addperson(@RequestBody PersonDto dto){		
+		
+		String threadId = "";
+		threadId = dto.getId()+ "_addingPerson";
+		logger.debug("threadId : " + threadId);
+		ThreadContext.put("messageId", threadId);
+		
 	logger.info("The incoming request is    "+dto.toString());
 	System.out.println("enetered controllwer method");
 	System.out.println(dto.toString());
@@ -39,10 +53,46 @@ public class PersonController {
 	p.setLastname(dto.getLastname());
 	
 	logger.info("The generated entity is   "+p.toString());
+	logger.info("going to call service call ");
 	personser.createPerson(p);
 	
 	String response="The Person created with id  "+dto.getId();
+	ThreadContext.clearAll();
 	return ResponseEntity.ok(response);
+	
+	}
+	
+	
+	@GetMapping(produces = "application/json")
+	public ResponseEntity<List<PersonDto>> getAllPersons(){
+		
+		String threadId = "";
+		threadId = new Date()+ "_addingPerson";
+		logger.debug("threadId : " + threadId);
+		ThreadContext.put("messageId", threadId);
+		
+		logger.info("entering in the get fetchAll persons method");
+		
+		List<PersonDto> personloist=new ArrayList<PersonDto>();
+		Iterable<Person> iter=personser.fetchAllthePersons();
+		for(Person p:iter) {
+		logger.info("prininting the list of Person entity   "+p.toString());
+		
+		}
+		for(Person p:iter) {
+			PersonDto p1=new PersonDto();
+			p1.setDate(p.getDate());
+			p1.setEmail(p.getEmail());
+			p1.setFirstname(p.getFirstname());
+			p1.setLastname(p.getLastname());
+			p1.setId(p.getId());
+			
+			personloist.add(p1);
+			
+			
+		}
+		ThreadContext.clearAll();
+		return ResponseEntity.ok(personloist);
 	}
 	
 }
