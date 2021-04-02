@@ -55,7 +55,7 @@ public class PersonManagement {
 	
 	
 	public Person fetchPersonById(Integer id) {
-		LOGGER.info("Data saved in DB");
+		System.out.println("inside fetch mthod of service");
 		
 		return dao.findById(id).get();
 		 

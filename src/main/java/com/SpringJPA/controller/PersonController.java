@@ -3,6 +3,7 @@ package com.SpringJPA.controller;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +11,7 @@ import org.apache.logging.log4j.ThreadContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.SpringJPA.dto.PersonDto;
 import com.SpringJPA.entity.Person;
+import com.SpringJPA.exception.NosuchPerson;
 import com.SpringJPA.service.PersonManagement;
 
 @RestController
@@ -87,12 +90,62 @@ public class PersonController {
 			p1.setLastname(p.getLastname());
 			p1.setId(p.getId());
 			
-			personloist.add(p1);
-			
+			personloist.add(p1);	
 			
 		}
 		ThreadContext.clearAll();
 		return ResponseEntity.ok(personloist);
+	}
+	
+	@GetMapping(value = "/{id}", produces = "application/json") 
+	public ResponseEntity<Object> getPsersonById (@PathVariable int id) throws Throwable {
+		PersonDto p=new PersonDto();
+		Person entity=new Person();
+		try {
+		 
+		String threadId = "";
+		threadId = id+"  get by id method invoked";
+		logger.debug("threadId : " + threadId);
+		ThreadContext.put("messageId", threadId);
+		
+		entity=personser.fetchPersonById(id);
+		if(entity==null)
+		{
+			throw new NosuchPerson("No such person data base");
+		}
+		else
+			p.setDate(entity.getDate());
+		    p.setEmail(entity.getEmail());
+		    p.setFirstname(entity.getFirstname());
+		    p.setId(entity.getId());
+		    p.setLastname(entity.getLastname());
+		  }
+		
+		catch(NosuchPerson e) {
+			logger.debug("inside No such person catch block    " +e);
+			throw new NosuchPerson("No such person catch block"); 
+		}
+		
+
+       catch (NoSuchElementException e)		{
+    	    e.printStackTrace();
+			logger.error(e.getStackTrace());
+			logger.error(e.getCause());
+    	   throw new NosuchPerson("No such person data base");
+    	   
+       }
+		
+		catch(Exception e) {
+			logger.debug("inside generic Exception catch block   " +e);
+			e.printStackTrace();
+		//	logger.info(e.printStackTrace());
+			logger.error(e.getCause());
+			
+			throw new Exception(e.getMessage()); 
+		}
+		   
+		
+		    return ResponseEntity.ok(p);
 	}
 	
 }
