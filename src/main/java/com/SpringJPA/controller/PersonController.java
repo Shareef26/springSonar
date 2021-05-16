@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.validation.Valid;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.ThreadContext;
@@ -36,7 +38,9 @@ public class PersonController {
 	
 	
 	@PostMapping(consumes = "application/json", produces = "application/json")
-	public ResponseEntity<String> addperson(@RequestBody PersonDto dto){		
+	public ResponseEntity<String> addperson(@Valid @RequestBody PersonDto dto) throws Throwable{		
+		
+		
 		
 		String threadId = "";
 		threadId = dto.getId()+ "_addingPerson";
@@ -64,6 +68,7 @@ public class PersonController {
 	return ResponseEntity.ok(response);
 	
 	}
+	
 	
 	
 	@GetMapping(produces = "application/json")

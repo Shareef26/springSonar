@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -21,7 +23,14 @@ import com.SpringJPA.service.PersonManagement;
 @Configuration
 @EnableWebMvc
 @ComponentScan(basePackages = "com.SpringJPA")
-public class SpringJpaApplication implements CommandLineRunner {
+public class SpringJpaApplication extends SpringBootServletInitializer  implements CommandLineRunner {
+	
+	@Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(SpringApplication.class);
+    }
+	
+	
 	@Autowired PersonManagement Personmanage;
 
 	public static void main(String[] args) {
